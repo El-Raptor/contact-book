@@ -2,12 +2,12 @@ package com.raptor.agendadecontatos.controller;
 
 import com.raptor.agendadecontatos.model.Contact;
 import com.raptor.agendadecontatos.service.ContactService;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
+@CrossOrigin
 @RequestMapping("/api")
 public class ContactController {
     private final ContactService contactService;
