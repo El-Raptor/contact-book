@@ -44,4 +44,13 @@ public class ContactController {
         return new ResponseEntity<>(contact, HttpStatus.OK);
     }
 
+    @DeleteMapping("contacts/{id}")
+    public ResponseEntity<Contact> deleteContactById(@PathVariable int id) {
+        var contact = contactService.findById(id);
+        if (contact == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        contactService.deleteById(id);
+        return new ResponseEntity<>(contact, HttpStatus.OK);
+    }
+
 }
