@@ -88,7 +88,7 @@ public class ContactController {
     ) @RequestBody Contact contact) {
         var newContact = contactService.save(contact);
         URI location = URI.create("/api/contacts/" + newContact.getId());
-        return new ResponseEntity<>(contact, HttpStatus.CREATED);
+        return ResponseEntity.created(location).body(newContact);
     }
 
     @Operation(summary = "Update a contact")
