@@ -5,6 +5,7 @@ import com.raptor.agendadecontatos.service.ContactService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -73,8 +75,19 @@ public class ContactController {
             )
     })
     @PostMapping("/")
-    public ResponseEntity<Contact> addContact(@RequestBody Contact contact) {
-        contactService.save(contact);
+    public ResponseEntity<Contact> addContact(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Contact to create",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Contact.class),
+                    examples = @ExampleObject(value =
+                            "{\"name\": \"new contact\", \"email\": \"new.contact@email.com\", \"phone\": \"5511999999999\"}"
+                    )
+            )
+    ) @RequestBody Contact contact) {
+        var newContact = contactService.save(contact);
+        URI location = URI.create("/api/contacts/" + newContact.getId());
         return new ResponseEntity<>(contact, HttpStatus.CREATED);
     }
 
@@ -87,15 +100,32 @@ public class ContactController {
                     )
             )
     })
-    @PutMapping("/")
-    public ResponseEntity<Contact> updateContact(@RequestBody Contact contact) {
-        contactService.save(contact);
-        return new ResponseEntity<>(contact, HttpStatus.OK);
+    @PutMapping("/{id}")
+    public ResponseEntity<Contact> updateContact(@Parameter(description = "id of contact to be searched")
+                                                 @PathVariable int id,
+                                                 @Parameter(description = "Contact to be updated")
+                                                 @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                         description = "Contact to create",
+                                                         required = true,
+                                                         content = @Content(
+                                                                 mediaType = "application/json",
+                                                                 schema = @Schema(implementation = Contact.class),
+                                                                 examples = @ExampleObject(value =
+                                                                         "{\"name\": \"new contact\", \"email\": \"new.contact@email.com\", \"phone\": \"5511999999999\"}"
+                                                                 )
+                                                         )
+                                                 ) @RequestBody Contact contact) {
+        var existingContact = contactService.findById(id);
+        if (existingContact == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        contact.setId(id);
+        var updatedContact = contactService.save(contact);
+        return new ResponseEntity<>(updatedContact, HttpStatus.OK);
     }
 
     @Operation(summary = "Delete a contact")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact deleted",
+            @ApiResponse(responseCode = "204", description = "Contact deleted",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = Contact.class)
@@ -109,12 +139,13 @@ public class ContactController {
             )
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Contact> deleteContactById(@PathVariable int id) {
+    public ResponseEntity<Contact> deleteContactById(@Parameter(description = "id of contact to be deleted")
+                                                     @PathVariable int id) {
         var contact = contactService.findById(id);
         if (contact == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         contactService.deleteById(id);
-        return new ResponseEntity<>(contact, HttpStatus.OK);
+        return new ResponseEntity<>(contact, HttpStatus.NO_CONTENT);
     }
 
 }
