@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api")
+@RequestMapping("/api/contacts")
 public class ContactController {
     private final ContactService contactService;
 
@@ -25,7 +25,7 @@ public class ContactController {
     }
 
     @Operation(summary = "Get all contacts")
-    @GetMapping("/contacts")
+    @GetMapping("/")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Found contact",
                     content = @Content(
@@ -54,7 +54,7 @@ public class ContactController {
                     )
             )
     })
-    @GetMapping("contacts/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Contact> getContactById(@Parameter(description = "id of contact to be searched")
                                                   @PathVariable int id) {
         var contact = contactService.findById(id);
@@ -72,7 +72,7 @@ public class ContactController {
                     )
             )
     })
-    @PostMapping("contacts")
+    @PostMapping("/")
     public ResponseEntity<Contact> addContact(@RequestBody Contact contact) {
         contactService.save(contact);
         return new ResponseEntity<>(contact, HttpStatus.CREATED);
@@ -87,7 +87,7 @@ public class ContactController {
                     )
             )
     })
-    @PutMapping("contacts")
+    @PutMapping("/")
     public ResponseEntity<Contact> updateContact(@RequestBody Contact contact) {
         contactService.save(contact);
         return new ResponseEntity<>(contact, HttpStatus.OK);
@@ -108,7 +108,7 @@ public class ContactController {
                     )
             )
     })
-    @DeleteMapping("contacts/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Contact> deleteContactById(@PathVariable int id) {
         var contact = contactService.findById(id);
         if (contact == null)
