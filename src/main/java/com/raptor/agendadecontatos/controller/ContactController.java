@@ -2,6 +2,8 @@ package com.raptor.agendadecontatos.controller;
 
 import com.raptor.agendadecontatos.model.Contact;
 import com.raptor.agendadecontatos.service.ContactService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,23 +19,29 @@ public class ContactController {
     }
 
     @GetMapping("/contacts")
-    public List<Contact> getAllContacts() {
-        return contactService.findAll();
+    public ResponseEntity<List<Contact>> getAllContacts() {
+        var contacts = contactService.findAll();
+        return new ResponseEntity<>(contacts, HttpStatus.OK);
     }
 
     @GetMapping("contacts/{id}")
-    public Contact getContactById(@PathVariable int id) {
-        return contactService.findById(id);
+    public ResponseEntity<Contact> getContactById(@PathVariable int id) {
+        var contact = contactService.findById(id);
+        if (contact == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(contact, HttpStatus.OK);
     }
 
-    @PostMapping("contact")
-    public void addContact(@RequestBody Contact contact) {
+    @PostMapping("contacts")
+    public ResponseEntity<Contact> addContact(@RequestBody Contact contact) {
         contactService.save(contact);
+        return new ResponseEntity<>(contact, HttpStatus.CREATED);
     }
 
-    @PutMapping("contact")
-    public void updateContact(@RequestBody Contact contact) {
+    @PutMapping("contacts")
+    public ResponseEntity<Contact> updateContact(@RequestBody Contact contact) {
         contactService.save(contact);
+        return new ResponseEntity<>(contact, HttpStatus.OK);
     }
 
 }
